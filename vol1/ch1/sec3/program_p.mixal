@@ -1,0 +1,52 @@
+* Table of Primes
+*
+L       EQU     500             number of primes to find
+PRINTER EQU     18              unit number of line printer
+PRIME   EQU     -1              memory area for table of primes
+BUF0    EQU     2000            memory area for buffer[0]
+BUF1    EQU     BUF0+25         memory area for buffer[1]
+        ORIG    3000        
+START   IOC     0(PRINTER)      skip to new page
+        LD1     =1-L=           P1. start table j <- 1
+        LD2     =3=                 n <- 3
+2H      INC1    1               P2. n is prime, j <- j + 1
+        ST2     PRIME+L,1           prime[j] <- n
+        J1Z     2F              P3. 500 found?
+4H      INC2    2               P4. advance n
+        ENT3    2               P5. k <- 2
+6H      ENTA    0               P6. prime[k]\n?
+        ENTX    0,2                 rAX <- n
+        DIV     PRIME,3             rA <- q, rX <- r
+        JXZ     4B                  to P4 if r=0
+        CMPA    PRIME,3         is prime[k] large
+        INC3    1               advance k
+        JG      6B                  to P6 if q > prime k
+        JMP     2B                  otherwise n is prime
+2H      OUT     TITLE(PRINTER)  P9. print title
+        ENT4    BUF1+10             b <- 1
+        ENT5    -50                 m <- 0
+2H      INC5    L+1                 advance m
+4H      LDA     PRIME,5         P10. set up line
+        CHAR
+        STX     0,4(1:4)
+        DEC4    1
+        DEC5    50                  (rI5 goes down by 50 until it is nonpositive)
+        J5P     4B
+        OUT     0,4(PRINTER)    P11. print line
+        LD4     24,4                switch buffers
+        J5N     2B                  if rI5 = 0, done
+        HLT
+* INITIAL CONTENTS OF TABLES AND BUFFERS
+        ORIG    PRIME+1
+        CON     2
+        ORIG    BUF0-5
+TITLE   ALF  FIRST
+        ALF  FIVE
+        ALF   HUND
+        ALF  RED P
+        ALF  RIMES
+        ORIG    BUF0+24
+        CON     BUF1+10         each buffer refers to the others
+        ORIG    BUF1+24
+        CON     BUF0+10
+        END     START           end of routine
